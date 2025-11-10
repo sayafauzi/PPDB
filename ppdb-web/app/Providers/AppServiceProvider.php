@@ -8,6 +8,7 @@ use App\Models\Registrasi;
 use App\Observers\RegistrasiObserver;
 use Filament\Facades\Filament;
 use Filament\Auth\Http\Responses\LoginResponse as BaseLoginResponse;
+use Filament\Forms\Components\DateTimePicker;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +29,9 @@ class AppServiceProvider extends ServiceProvider
             app()->bind(BaseLoginResponse::class, CustomLoginResponse::class);
         });
         Registrasi::observe(RegistrasiObserver::class);
+
+        DateTimePicker::configureUsing(function (DateTimePicker $component): void {
+        $component->timezone('Asia/Jakarta');
+    });
     }
 }

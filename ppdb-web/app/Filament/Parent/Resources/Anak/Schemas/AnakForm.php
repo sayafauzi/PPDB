@@ -25,6 +25,8 @@ class AnakForm
                         ->required(fn () => Auth::user()->tipe_akun !== 'U')
                         ->required(fn() => auth::user()->tipe_akun !== 'U')
                         ->default(fn() => auth::user()->tipe_akun === 'U' ? auth::id() : null)
+                        ->disabled()
+                        ->dehydrated(true)
                         ->required(),
                 ]),
 
