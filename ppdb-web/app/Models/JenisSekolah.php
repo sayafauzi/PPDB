@@ -15,9 +15,14 @@ class JenisSekolah extends Model
         'kode_jenis', 'nama_jenis', 'kuota', 'sisa_kuota', 'kapasitas', 'status_aktif'
     ];
 
+    // public function sekolah()
+    // {
+    //     return $this->hasMany(Sekolah::class, 'jenis_sekolah_id');
+    // }
+
     public function sekolah()
     {
-        return $this->hasMany(Sekolah::class, 'jenis_sekolah_id');
+        return $this->belongsTo(Sekolah::class, 'sekolah_id');
     }
     
     public function akun()

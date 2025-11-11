@@ -24,6 +24,7 @@ return new class extends Migration {
             
             $table->foreign('id_anak')->references('id')->on('anak')->cascadeOnDelete();
             $table->foreign('id_sekolah')->references('id')->on('sekolah')->cascadeOnDelete();
+            $table->foreignId('jenis_sekolah_id')->nullable()->constrained('jenis_sekolah')->nullOnDelete();
             $table->timestamps();
             
         });

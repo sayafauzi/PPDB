@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->integer('biaya_awal')->default(0);
             $table->integer('biaya_spp')->default(0);
             $table->boolean('status_aktif')->default(true);
-            $table->foreignId('jenis_sekolah_id')->nullable()->constrained('jenis_sekolah')->nullOnDelete();
+            // $table->foreignId('jenis_sekolah_id')->nullable()->constrained('jenis_sekolah')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -32,6 +32,7 @@ class RegistrasiTable
                 ]),
                 TextColumn::make('nominal_transfer')->money('IDR')->label('Nominal'),
                 TextColumn::make('waktu_daftar')->dateTime(),
+                TextColumn::make('deadline_bayar')->dateTime(),
             ])
             ->filters([
                 //

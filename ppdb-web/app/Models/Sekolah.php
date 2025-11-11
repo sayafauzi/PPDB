@@ -18,9 +18,14 @@ class Sekolah extends Model
         'biaya_spp','status_aktif','jenis_sekolah_id'
     ];
 
+    // public function jenisSekolah()
+    // {
+    //     return $this->belongsTo(JenisSekolah::class);
+    // }
+
     public function jenisSekolah()
     {
-        return $this->belongsTo(JenisSekolah::class);
+        return $this->hasMany(JenisSekolah::class, 'sekolah_id');
     }
 
     public function akunSekolah()

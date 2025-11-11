@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Registrasi\Schemas;
 
 use App\Models\Anak;
+use App\Models\JenisSekolah;
 use App\Models\Sekolah;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -41,24 +42,85 @@ class RegistrasiForm
                             return Anak::pluck('nama_lengkap', 'id');
                         }),
 
+                    // Select::make('id_sekolah')
+                    //     ->label('Sekolah Tujuan')
+                    //     ->relationship('sekolah', 'nama_sekolah')
+                    //     ->searchable()
+                    //     ->required()
+                    //     ->preload()
+                    //     ->options(function () use ($user) {
+                    //         if ($user->tipe_akun === 'A') {
+                    //             // Admin hanya sekolah yang diassign padanya
+                    //             return Sekolah::whereHas('akunSekolah', function ($q) use ($user) {
+                    //                 $q->where('akun_id', $user->id);
+                    //             })
+                    //                 ->where('status_aktif', true)
+                    //                 ->pluck('nama_sekolah', 'id');
+                    //         }
+                    //         return Sekolah::where('status_aktif', true)
+                    //             ->pluck('nama_sekolah', 'id');
+                    //     }),
+
                     Select::make('id_sekolah')
                         ->label('Sekolah Tujuan')
-                        ->relationship('sekolah', 'nama_sekolah')
-                        ->searchable()
-                        ->required()
-                        ->preload()
                         ->options(function () use ($user) {
                             if ($user->tipe_akun === 'A') {
-                                // Admin hanya sekolah yang diassign padanya
-                                return Sekolah::whereHas('akunSekolah', function ($q) use ($user) {
-                                    $q->where('akun_id', $user->id);
-                                })
-                                    ->where('status_aktif', true)
-                                    ->pluck('nama_sekolah', 'id');
+                                return Sekolah::whereHas('akunSekolah', fn($q) => 
+                                    $q->where('akun_id', $user->id)
+                                )
+                                ->where('status_aktif', true)
+                                ->pluck('nama_sekolah', 'id');
                             }
                             return Sekolah::where('status_aktif', true)
                                 ->pluck('nama_sekolah', 'id');
+                        })
+                        ->searchable()
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            $sekolah = Sekolah::find($state);
+                            $set('nominal_transfer', $sekolah?->biaya_pendaftaran ?? 0);
+                            $set('jenis_sekolah_id', null); // reset pilihan jenis saat ganti sekolah
                         }),
+
+                    Select::make('jenis_sekolah_id')
+                        ->label('Jenis Sekolah')
+                        // ->options(function (callable $get) {
+                        //     $sekolahId = $get('id_sekolah');
+                        //     if (!$sekolahId) return [];
+                        //     return \App\Models\JenisSekolah::where('sekolah_id', $sekolahId)
+                        //         ->where('status_aktif', true)
+                        //         ->get()
+                        //         ->mapWithKeys(fn($jenis) => [
+                        //             $jenis->id => "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kuota})"
+                        //         ]);
+                        // })
+                        ->relationship('jenisSekolah', 'nama_jenis', function ($query, callable $get) {
+                            return $query->when($get('id_sekolah'), fn ($q) =>
+                                $q->where('sekolah_id', $get('id_sekolah'))
+                            );
+                        })
+                        ->options(function (callable $get) {
+                            $idSekolah = $get('id_sekolah');
+                            if (!$idSekolah) return [];
+
+                            // ambil semua jenis sekolah yang tersedia pada sekolah ini
+                            return JenisSekolah::where('sekolah_id', $idSekolah)
+                                ->get()
+                                ->mapWithKeys(function ($jenis) {
+                                    $label = "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kapasitas})";
+                                    return [$jenis->id => $label];
+                                });
+                        })
+                        ->getOptionLabelUsing(function ($value) {
+                            $jenis = JenisSekolah::find($value);
+                            return $jenis ? "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kapasitas})" : null;
+                        })
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Pilih jenis sekolah berdasarkan kuota yang tersedia.')
+                        ->reactive(),
 
                     Select::make('status')
                         ->label('Status Pendaftaran')

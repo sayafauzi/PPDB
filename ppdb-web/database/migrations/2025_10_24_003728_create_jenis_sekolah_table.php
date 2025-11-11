@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->boolean('status_aktif')->default(true);
             $table->string('akun_id')->nullable()->index();
             $table->foreign('akun_id')->references('id')->on('akun')->nullOnDelete();
+            // $table->foreignId('jenis_sekolah_id')->constrained('jenis_sekolah')->onDelete('cascade');
+            $table->foreignId('sekolah_id')->nullable()->constrained('sekolah')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Sekolah\Schemas;
 
+use App\Models\JenisSekolah;
 use App\Models\Sekolah;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -27,12 +30,62 @@ class SekolahForm
                             ->label('Nama Sekolah')
                             ->required(),
 
-                        Select::make('jenis_sekolah_id')
-                            ->label('Jenis Sekolah')
-                            ->relationship('jenisSekolah', 'nama_jenis')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
+                        // Repeater::make('jenis_sekolah')
+                        //     ->label('Daftar Jenis Sekolah')
+                        //     ->relationship('jenisSekolah') // relasi hasMany dari model Sekolah
+                        //     ->schema([
+                        //         Grid::make(3)->schema([
+                        //             Select::make('jenis_sekolah_id')
+                        //                 ->label('Jenis Sekolah')
+                        //                 ->options(JenisSekolah::pluck('nama_jenis', 'id'))
+                        //                 ->getOptionLabelUsing(fn($value): ?string => JenisSekolah::find($value)?->nama_jenis)
+                        //                 ->searchable()
+                        //                 ->required()
+                        //                 ->reactive()
+                        //                 ->afterStateUpdated(function ($state, callable $set) {
+                        //                     if ($state) {
+                        //                         $jenis = JenisSekolah::find($state);
+                        //                         if ($jenis) {
+                        //                             $set('kapasitas', $jenis->kapasitas);
+                        //                             $set('sisa_kuota', $jenis->sisa_kuota);
+                        //                         }
+                        //                     }
+                        //                 })
+                        //                 ->helperText('Pilih jenis sekolah yang sudah terdaftar.'),
+                                    
+                        //             TextInput::make('kapasitas')
+                        //                 ->label('Kapasitas')
+                        //                 ->numeric()
+                        //                 ->readOnly()
+                        //                 ->default(0),
+
+                        //             TextInput::make('sisa_kuota')
+                        //                 ->label('Sisa Kuota')
+                        //                 ->numeric()
+                        //                 ->readOnly()
+                        //                 ->default(0),
+                        //         ]),
+                        //     ])
+                        //     ->columns(1)
+                        //     ->columnSpanFull()
+                        //     ->collapsible()
+                        //     ->createItemButtonLabel('Tambah Jenis Sekolah')
+                        //     ->helperText('Setiap sekolah bisa memiliki lebih dari satu jenis sekolah yang sudah tersedia di database.'),
+
+                       Section::make('Jenis Sekolah di Bawah Naungan')
+                            ->description('Tambahkan satu atau lebih jenis sekolah yang dikelola oleh sekolah ini.')
+                            ->schema([
+                                Select::make('jenis_sekolah_id')
+                                    ->label('Jenis Sekolah')
+                                    ->relationship('jenisSekolah', 'nama_jenis')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->hint('Pilih jenis sekolah yang sudah ada'),
+                            ])
+                            ->collapsed(false)
+                            ->columns(1)
+                            ->columnSpanFull(),
 
                         Textarea::make('alamat')
                             ->label('Alamat')
@@ -45,7 +98,7 @@ class SekolahForm
                         Toggle::make('status_aktif')
                             ->label('Status Aktif')
                             ->default(true),
-                    ])->columns(2),
+                    ])->columns(2)->columnSpanFull(),
                 
                 Section::make('Rekening & Biaya')
                     ->schema([
@@ -68,8 +121,7 @@ class SekolahForm
                     ->schema([
                         Textarea::make('syarat')
                             ->label('Syarat & Ketentuan')
-                            ->rows(4)
-                            ->columnSpanFull(),
+                            ->rows(4),
                     ]),
             ]);
     }

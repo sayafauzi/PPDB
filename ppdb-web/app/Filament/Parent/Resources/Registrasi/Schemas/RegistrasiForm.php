@@ -40,6 +40,27 @@ class RegistrasiForm
                             ->preload()
                             ->reactive(),
 
+                        // Select::make('id_sekolah')
+                        //     ->label('Sekolah Tujuan')
+                        //     ->options(function () use ($user) {
+                        //         if ($user->tipe_akun === 'A') {
+                        //             return Sekolah::whereHas('akunSekolah', fn($q) => 
+                        //                 $q->where('akun_id', $user->id)
+                        //             )
+                        //             ->where('status_aktif', true)
+                        //             ->pluck('nama_sekolah', 'id');
+                        //         }
+                        //         return Sekolah::where('status_aktif', true)
+                        //             ->pluck('nama_sekolah', 'id');
+                        //     })
+                        //     ->searchable()
+                        //     ->required()
+                        //     ->reactive() // penting untuk trigger update nominal_transfer
+                        //     ->afterStateUpdated(function ($state, callable $set) {
+                        //         $sekolah = Sekolah::find($state);
+                        //         $set('nominal_transfer', $sekolah?->biaya_pendaftaran ?? 0);
+                        //     }),
+
                         Select::make('id_sekolah')
                             ->label('Sekolah Tujuan')
                             ->options(function () use ($user) {
@@ -55,11 +76,34 @@ class RegistrasiForm
                             })
                             ->searchable()
                             ->required()
-                            ->reactive() // penting untuk trigger update nominal_transfer
+                            ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 $sekolah = Sekolah::find($state);
                                 $set('nominal_transfer', $sekolah?->biaya_pendaftaran ?? 0);
+                                $set('jenis_sekolah_id', null); // reset pilihan jenis saat ganti sekolah
                             }),
+
+                        Select::make('id_jenis_sekolah_id')
+                            ->label('Jenis Sekolah')
+                            ->options(function (callable $get) {
+                                $sekolahId = $get('id_sekolah');
+                                if (!$sekolahId) return [];
+                                return \App\Models\JenisSekolah::where('sekolah_id', $sekolahId)
+                                    ->where('status_aktif', true)
+                                    ->get()
+                                    ->mapWithKeys(fn($jenis) => [
+                                        $jenis->id => "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kuota})"
+                                    ]);
+                            })
+                            ->relationship('jenisSekolah', 'nama_jenis', function ($query, callable $get) {
+                                return $query->when($get('id_sekolah'), fn ($q) =>
+                                    $q->where('sekolah_id', $get('id_sekolah'))
+                                );
+                            })
+                            ->reactive()
+                            ->required()
+                            ->dehydrated(true)
+                            ->helperText('Pilih jenis sekolah berdasarkan kuota yang tersedia.'),
 
                         Select::make('status')
                             ->label('Status Pendaftaran')
