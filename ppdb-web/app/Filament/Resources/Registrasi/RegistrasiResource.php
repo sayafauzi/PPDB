@@ -67,28 +67,28 @@ class RegistrasiResource extends Resource
     }
 
     public static function getEloquentQuery(): Builder
-{
-    $user = Filament::auth()->user();
-    $query = parent::getEloquentQuery();
+    {
+        $user = Filament::auth()->user();
+        $query = parent::getEloquentQuery();
 
-    if ($user->tipe_akun === 'SU') {
+        if ($user->tipe_akun === 'SU') {
+            return $query;
+        }
+
+        if ($user->tipe_akun === 'A') {
+            // Admin hanya bisa melihat registrasi ke sekolah-nya
+            return $query->whereHas('sekolah.akunSekolah', function ($q) use ($user) {
+                $q->where('akun_id', $user->id);
+            });
+        }
+
+        if ($user->tipe_akun === 'U') {
+            // Orang tua hanya melihat registrasi anaknya
+            return $query->whereHas('anak', function ($q) use ($user) {
+                $q->where('id_akun_orangtua', $user->id);
+            });
+        }
+
         return $query;
     }
-
-    if ($user->tipe_akun === 'A') {
-        // Admin hanya bisa melihat registrasi ke sekolah-nya
-        return $query->whereHas('sekolah.akunSekolah', function ($q) use ($user) {
-            $q->where('akun_id', $user->id);
-        });
-    }
-
-    if ($user->tipe_akun === 'U') {
-        // Orang tua hanya melihat registrasi anaknya
-        return $query->whereHas('anak', function ($q) use ($user) {
-            $q->where('id_akun_orangtua', $user->id);
-        });
-    }
-
-    return $query;
-}
 }

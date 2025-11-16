@@ -19,7 +19,7 @@ class RegistrasiResource extends Resource
     protected static ?string $model = Registrasi::class;
     protected static ?string $slug = 'registrasi';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     protected static ?string $recordTitleAttribute = 'Registrasi';
 

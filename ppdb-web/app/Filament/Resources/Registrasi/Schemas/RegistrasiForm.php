@@ -10,6 +10,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -146,6 +147,9 @@ class RegistrasiForm
                 ->description('Isi data pembayaran untuk validasi.')
                 ->columns(2)
                 ->schema([
+                    View::make('filament.registrasi.info-rekening')
+                        ->columnSpan(2),
+
                     FileUpload::make('bukti_pembayaran')
                         ->label('Bukti Pembayaran')
                         ->directory('bukti-pembayaran')

@@ -21,6 +21,7 @@ class RegistrasiTable
             ->columns([
                 TextColumn::make('anak.nama_lengkap')->label('Nama Anak'),
                 TextColumn::make('sekolah.nama_sekolah')->label('Sekolah'),
+                TextColumn::make('jenisSekolah.nama_jenis')->label('Jenis'),
                 BadgeColumn::make('status')
                 ->colors([
                     'gray' => 'menunggu_pembayaran',

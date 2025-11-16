@@ -3,6 +3,7 @@
 namespace App\Filament\Parent\Resources\Registrasi\Schemas;
 
 use App\Models\Anak;
+use App\Models\JenisSekolah;
 use App\Models\Registrasi;
 use App\Models\Sekolah;
 use Filament\Forms\Components\DateTimePicker;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -83,27 +85,35 @@ class RegistrasiForm
                                 $set('jenis_sekolah_id', null); // reset pilihan jenis saat ganti sekolah
                             }),
 
-                        Select::make('id_jenis_sekolah_id')
+                        Select::make('jenis_sekolah_id')
                             ->label('Jenis Sekolah')
-                            ->options(function (callable $get) {
-                                $sekolahId = $get('id_sekolah');
-                                if (!$sekolahId) return [];
-                                return \App\Models\JenisSekolah::where('sekolah_id', $sekolahId)
-                                    ->where('status_aktif', true)
-                                    ->get()
-                                    ->mapWithKeys(fn($jenis) => [
-                                        $jenis->id => "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kuota})"
-                                    ]);
-                            })
                             ->relationship('jenisSekolah', 'nama_jenis', function ($query, callable $get) {
                                 return $query->when($get('id_sekolah'), fn ($q) =>
                                     $q->where('sekolah_id', $get('id_sekolah'))
                                 );
                             })
-                            ->reactive()
+                            ->options(function (callable $get) {
+                                $idSekolah = $get('id_sekolah');
+                                if (!$idSekolah) return [];
+
+                                // ambil semua jenis sekolah yang tersedia pada sekolah ini
+                                return JenisSekolah::where('sekolah_id', $idSekolah)
+                                    ->get()
+                                    ->mapWithKeys(function ($jenis) {
+                                        $label = "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kapasitas})";
+                                        return [$jenis->id => $label];
+                                    });
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $jenis = JenisSekolah::find($value);
+                                return $jenis ? "{$jenis->nama_jenis} (Kuota: {$jenis->sisa_kuota}/{$jenis->kapasitas})" : null;
+                            })
                             ->required()
-                            ->dehydrated(true)
-                            ->helperText('Pilih jenis sekolah berdasarkan kuota yang tersedia.'),
+                            ->searchable()
+                            ->preload()
+                            ->helperText('Pilih jenis sekolah berdasarkan kuota yang tersedia.')
+                            ->reactive(),
+
 
                         Select::make('status')
                             ->label('Status Pendaftaran')
@@ -129,6 +139,9 @@ class RegistrasiForm
                     ->description('Isi data pembayaran untuk validasi.')
                     ->columns(2)
                     ->schema([
+                        View::make('filament.registrasi.info-rekening')
+                            ->columnSpan(2),
+
                         FileUpload::make('bukti_pembayaran')
                             ->label('Bukti Pembayaran')
                             ->directory('bukti-pembayaran')

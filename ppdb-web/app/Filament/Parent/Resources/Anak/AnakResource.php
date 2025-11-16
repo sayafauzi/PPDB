@@ -20,7 +20,7 @@ class AnakResource extends Resource
     protected static ?string $model = Anak::class;
     protected static ?string $slug = 'anak';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserPlus;
 
     protected static ?string $recordTitleAttribute = 'Anak';
 
