@@ -20,6 +20,14 @@ class AkunSekolahForm
                         ->relationship('akun', 'name') // pastikan kolom `nama` ada di tabel `akun`
                         ->searchable()
                         ->preload()
+                        ->options(
+                            \App\Models\Akun::where('tipe_akun', 'A')
+                                ->get()
+                                ->mapWithKeys(function ($akun) {
+                                    $last4 = $akun->no_telp ? substr($akun->no_telp, -4) : '----';
+                                    return [$akun->id => "{$akun->name} - {$last4}"];
+                                })
+                        )
                         ->required(),
 
                     Select::make('sekolah_id')
@@ -31,14 +39,12 @@ class AkunSekolahForm
 
                     Select::make('role_in_school')
                         ->label('Peran di Sekolah')
-                        ->options([
-                            'admin' => 'Admin Sekolah',
-                            'panitia' => 'Panitia PPDB',
-                        ])
-                        ->default('panitia')
-                        ->required(),
+                        ->default('admin')
+                        ->hidden()
+                        ->disabled()
+                        ->dehydrated(true),
                 ])
-                ->columns(3),
+                ->columns(3)->columnSpanFull(),
         ]);
     }
 }

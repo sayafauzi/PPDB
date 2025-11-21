@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('akun_id');
             $table->integer('sekolah_id');
-            $table->enum('role_in_school', ['admin', 'panitia'])->default('panitia');
+            $table->enum('role_in_school', ['admin', 'panitia'])->default('admin');
             $table->timestamps();
 
             $table->unique(['akun_id', 'sekolah_id']);

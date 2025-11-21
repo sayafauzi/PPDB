@@ -33,17 +33,18 @@ class Sekolah extends Model
         return $this->hasMany(AkunSekolah::class, 'sekolah_id');
     }
 
+    // public function akun()
+    // {
+    //     return $this->belongsTo(Akun::class, 'akun_id');
+    // }
+
     public function akun()
     {
-        return $this->belongsTo(Akun::class, 'akun_id');
+        return $this->belongsToMany(Akun::class, 'akun_sekolah', 'sekolah_id', 'akun_id')
+            ->withPivot('role_in_school')
+            ->withTimestamps();
     }
 
-    public function admins()
-    {
-        return $this->belongsToMany(Akun::class, 'akun_sekolah')
-                    ->withPivot('role_in_school')
-                    ->withTimestamps();
-    }
 
     public function registrasi()
     {

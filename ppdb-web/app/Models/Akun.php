@@ -29,10 +29,18 @@ class Akun extends Authenticatable implements FilamentUser
     public $incrementing = false;
     protected $keyType = 'string';
 
+    // public function sekolah()
+    // {
+    //     return $this->belongsTo(Sekolah::class, 'id_sekolah');
+    // }
+
     public function sekolah()
     {
-        return $this->belongsTo(Sekolah::class, 'id_sekolah');
+        return $this->belongsToMany(Sekolah::class, 'akun_sekolah', 'akun_id', 'sekolah_id')
+            ->withPivot('role_in_school')
+            ->withTimestamps();
     }
+
 
     public function jenisSekolah()
     {

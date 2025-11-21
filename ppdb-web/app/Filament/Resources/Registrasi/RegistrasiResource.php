@@ -82,6 +82,11 @@ class RegistrasiResource extends Resource
             });
         }
 
+        if ($user->tipe_akun === 'A') {
+            return $query->whereIn('id_sekolah', $user->sekolahAssigns()->pluck('sekolah_id'));
+        }
+
+
         if ($user->tipe_akun === 'U') {
             // Orang tua hanya melihat registrasi anaknya
             return $query->whereHas('anak', function ($q) use ($user) {

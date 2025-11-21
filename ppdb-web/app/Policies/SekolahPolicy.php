@@ -27,7 +27,7 @@ class SekolahPolicy
 
         if ($user->tipe_akun === 'A') {
             // Admin hanya bisa melihat sekolah yang diassign
-            return $user->assignedSekolah()
+            return $user->sekolahAssigns()
                         ->where('sekolah_id', $sekolah->id)
                         ->exists();
         }
@@ -56,7 +56,7 @@ class SekolahPolicy
 
         if ($user->tipe_akun === 'A') {
             // Admin hanya dapat memperbarui sekolah yang diassign
-            return $user->assignedSekolah()
+            return $user->sekolahAssigns()
                         ->where('sekolah_id', $sekolah->id)
                         ->exists();
         }

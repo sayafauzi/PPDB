@@ -57,6 +57,6 @@ class InviteCodeResource extends Resource
     {
         $user = Auth::user();
 
-        return $user && in_array($user->tipe_akun, ['SU', 'A']);
+        return $user && in_array($user->tipe_akun, ['SU']);
     }
 }

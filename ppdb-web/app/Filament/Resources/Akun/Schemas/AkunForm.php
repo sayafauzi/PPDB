@@ -32,7 +32,8 @@ class AkunForm
                             ->password()
                             ->revealable()
                             ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null)
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->dehydrated(fn($state) => filled($state))
+                            ->visible(fn($context) => $context === 'edit' || $context === 'create')
                             ->label('Password'),
                         
                         // Component tipe_akun dipindahkan ke dalam section ini, 
@@ -48,20 +49,18 @@ class AkunForm
                             ->required(),
 
                     ])
-                    ->columns(2),
+                    ->columns(2),  
 
                 Section::make('Lokasi dan Sekolah')
                     ->schema([
                         TextInput::make('kelurahan'),
                         TextInput::make('kecamatan'),
 
-                        Select::make('id_sekolah')
-                            ->label('Sekolah')
+                        Select::make('sekolah')
+                            ->multiple()
                             ->relationship('sekolah', 'nama_sekolah')
-                            ->searchable()
-                            ->preload()
-                            // Gunakan helper user() jika Auth::user() adalah model
-                            ->visible(fn() => auth::user()?->tipe_akun === 'SU'), 
+                            ->visible(fn() => auth::user()?->tipe_akun === 'SU')
+                            ->preload(), 
                             // Asumsi Anda sudah mengimplementasikan logika tipe_akun di model user
                     ])
                     ->columns(2),

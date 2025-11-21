@@ -28,7 +28,7 @@ class RegistrasiPolicy
 
         if ($user->tipe_akun === 'A') {
             // Admin hanya dapat melihat registrasi di sekolah yang diassign
-            return $user->assignedSekolah()
+            return $user->sekolahAssigns()
                         ->where('sekolah_id', $registrasi->id_sekolah)
                         ->exists();
         }
@@ -60,7 +60,7 @@ class RegistrasiPolicy
 
         if ($user->tipe_akun === 'A') {
             // Admin bisa update status registrasi di sekolahnya
-            return $user->assignedSekolah()
+            return $user->sekolahAssigns()
                         ->where('sekolah_id', $registrasi->id_sekolah)
                         ->exists();
         }
