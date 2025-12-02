@@ -46,7 +46,10 @@ class AkunForm
                                 'A' => 'Admin Sekolah',
                                 'U' => 'Orang Tua',
                             ])
-                            ->required(),
+                            ->default('U')
+                            ->required()
+                            ->dehydrated(true),
+
 
                     ])
                     ->columns(2),  

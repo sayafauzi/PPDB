@@ -83,7 +83,7 @@ class RegisterWithInvite extends Page
                             ->required(),
 
                         Action::make('register')
-                            ->label('Daftar Sekarang')
+                            ->label('Daftar')
                             ->button()
                             ->submit('register')
                             ->color('primary')

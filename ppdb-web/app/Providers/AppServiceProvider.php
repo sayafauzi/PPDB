@@ -26,12 +26,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function () {
-            app()->bind(BaseLoginResponse::class, CustomLoginResponse::class);
-        });
-        Registrasi::observe(RegistrasiObserver::class);
+                app()->bind(BaseLoginResponse::class, CustomLoginResponse::class);
+            });
+            Registrasi::observe(RegistrasiObserver::class);
 
-        DateTimePicker::configureUsing(function (DateTimePicker $component): void {
-        $component->timezone('Asia/Jakarta');
-    });
+            DateTimePicker::configureUsing(function (DateTimePicker $component): void {
+            $component->timezone('Asia/Jakarta');
+        });
+        
     }
 }

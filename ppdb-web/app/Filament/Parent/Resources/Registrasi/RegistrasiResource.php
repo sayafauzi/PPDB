@@ -7,8 +7,10 @@ use App\Filament\Parent\Resources\Registrasi\Pages\EditRegistrasi;
 use App\Filament\Parent\Resources\Registrasi\Pages\ListRegistrasi;
 use App\Filament\Parent\Resources\Registrasi\Schemas\RegistrasiForm;
 use App\Filament\Parent\Resources\Registrasi\Tables\RegistrasiTable;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\Registrasi;
 use BackedEnum;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -62,5 +64,20 @@ class RegistrasiResource extends Resource
             'create' => CreateRegistrasi::route('/create'),
             'edit' => EditRegistrasi::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Filament::auth()->user();
+        $query = parent::getEloquentQuery();
+
+        if ($user->tipe_akun === 'U') {
+            // Orang tua hanya melihat registrasi anaknya
+            return $query->whereHas('anak', function ($q) use ($user) {
+                $q->where('id_akun_orangtua', $user->id);
+            });
+        }
+
+        return $query;
     }
 }

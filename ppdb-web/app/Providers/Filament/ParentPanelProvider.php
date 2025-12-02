@@ -2,8 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Parent\Pages\Auth\CustomRegister;
 use App\Filament\Parent\Pages\Dashboard;
 use App\Filament\Parent\Pages\ParentStats;
+use App\Http\Controllers\Auth\CustomRegisterController;
 use App\Http\Middleware\RedirectIfNotParent;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -18,6 +20,7 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Router;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -30,7 +33,7 @@ class ParentPanelProvider extends PanelProvider
             ->path('parent')
             ->login()
             ->default()
-            ->registration()
+            ->registration(CustomRegister::class)
             ->brandName('PPDB Panel')
             ->passwordReset()
             ->colors([

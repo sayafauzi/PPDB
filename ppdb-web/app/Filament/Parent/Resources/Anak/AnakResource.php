@@ -7,8 +7,10 @@ use App\Filament\Parent\Resources\Anak\Pages\EditAnak;
 use App\Filament\Parent\Resources\Anak\Pages\ListAnak;
 use App\Filament\Parent\Resources\Anak\Schemas\AnakForm;
 use App\Filament\Parent\Resources\Anak\Tables\AnakTable;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\Anak;
 use BackedEnum;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -86,5 +88,18 @@ class AnakResource extends Resource
             'create' => CreateAnak::route('/create'),
             'edit' => EditAnak::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Filament::auth()->user();
+        $query = parent::getEloquentQuery();
+
+        if ($user->tipe_akun === 'U') {
+            // Orang tua hanya melihat anaknya sendiri
+            return $query->where('id_akun_orangtua', $user->id)->with(['orangTua']);
+        }
+
+        return $query;
     }
 }
